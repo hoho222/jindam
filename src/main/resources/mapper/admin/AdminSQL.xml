@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin">
+
+	<select id="admin.selectMemberCnt" parameterType="hashmap" resultType="String">
+	     SELECT COUNT(*) 
+	     		<choose>
+		     	 	<when test="isToday != null and isToday != '' and isToday == 'OK'">
+		     	 		AS MEM_CNT_TODAY
+		     	 	</when>
+		     	 	<otherwise>
+		     	 		AS MEM_CNT_TOTAL
+		     	 	</otherwise>
+	     		</choose>
+	     FROM T_MEMBER
+	     <where>
+		     <if test="isToday != null and isToday != '' and isToday == 'OK'">
+		     	CREATE_DT between #{TodayStart} and #{TodayEnd}
+		     </if>
+	     </where>
+    </select>
+    
+   
+	<select id="admin.isAdminCnt" parameterType="hashmap" resultType="String">
+	     <![CDATA[
+	     SELECT COUNT(*)
+	     FROM T_ADMIN
+	     ]]>
+	     <where>
+		     <if test="adminId != null and adminId != ''">
+		     	AND ID = #{adminId}
+		     </if>
+		     <if test="adminPw != null and adminPw != ''">
+		     	AND PW = #{adminPw}
+		     </if>
+		 </where>
+    </select>
+    
+    <select id="admin.selectAdmin" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT NO, ID, PW, NAME, REGDATE
+	     FROM T_ADMIN
+	     ]]>
+	     <where>
+		     <if test="adminId != null and adminId != ''">
+		     	AND ID = #{adminId}
+		     </if>
+		     <if test="adminPw != null and adminPw != ''">
+		     	AND PW = #{adminPw}
+		     </if>
+	     </where>
+    </select>
+    
+    <select id="admin.selectMember" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT *
+	     FROM T_MEMBER
+	     ]]>
+	     <where>
+		     <if test="memberNo != null and memberNo != ''">
+		     	AND NO = #{memberNo}
+		     </if>
+	     </where>
+    </select>
+    
+    <select id="admin.selectMemberInfo" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT MEMBERNO, MOBILE, NAME, BIRTHYEAR, NICKNAME, REGION, JOB, COMPANY, BLOODTYPE, STANCE, 
+	     		GENDER, FAVORITE, FAVORITE_REASON, INTRODUCE, RELIGION, RELIGION_THINK
+	     FROM T_MEMBER_INFO
+	     ]]>
+	     <where>
+		     <if test="memberNo != null and memberNo != ''">
+		     	AND MEMBERNO = #{memberNo}
+		     </if>
+	     </where>
+    </select>
+    
+    <select id="admin.selectMemberInfoPass" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT *
+	     FROM T_MEMBER_INFO_PASS
+	     ]]>
+	     <where>
+		     <if test="memberNo != null and memberNo != ''">
+		     	AND MEMBERNO = #{memberNo}
+		     </if>
+	     </where>
+    </select>
+    
+    <select id="admin.selectMemberPassReadyList" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT 
+	     	MI.*, 
+	     	(SELECT M.NO FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) NO,
+	     	(SELECT M.EMAIL FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) EMAIL,
+	     	(SELECT M.ISAUTH FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) ISAUTH,
+	     	(SELECT M.ISPASS FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) ISPASS,
+	     	(SELECT M.STATUS FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) STATUS
+	     FROM T_MEMBER_INFO MI
+	     WHERE (SELECT M.STATUS FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) = 'I'
+	     ORDER BY MI.REGDATE DESC
+	     ]]>
+    </select>
+    
+    <update id="admin.updateMemberInfo">
+    	UPDATE T_MEMBER_INFO
+    	<set>
+    		<if test="MOBILE != null and MOBILE != ''">
+    		MOBILE = #{MOBILE},
+    		</if>
+    		<if test="NICKNAME != null and NICKNAME != ''">
+    		NICKNAME = #{NICKNAME},
+    		</if>
+	    	<if test="REGION != null and REGION != ''">
+    		REGION = #{REGION},
+    		</if>
+    		<if test="JOB != null and JOB != ''">
+    		JOB = #{JOB},
+    		</if>
+    		<if test="COMPANY != null and COMPANY != ''">
+    		COMPANY = #{COMPANY},
+    		</if>
+    		<if test="STANCE != null and STANCE != ''">
+    		STANCE = #{STANCE},
+    		</if>
+    		<if test="FAVORITE != null and FAVORITE != ''">
+    		FAVORITE = #{FAVORITE},
+    		</if>
+    		<if test="FAVORITE_REASON != null and FAVORITE_REASON != ''">
+    		FAVORITE_REASON = #{FAVORITE_REASON},
+    		</if>
+    		<if test="INTRODUCE != null and INTRODUCE != ''">
+    		INTRODUCE = #{INTRODUCE},
+    		</if>
+    		<if test="RELIGION != null and RELIGION != ''">
+    		RELIGION = #{RELIGION},
+    		</if>
+    		<if test="RELIGION_THINK != null and RELIGION_THINK != ''">
+    		RELIGION_THINK = #{RELIGION_THINK},
+    		</if>
+    	</set>
+    	
+    	<if test="memberNo != null and memberNo != ''">
+    		WHERE MEMBERNO = #{memberNo}
+    	</if>
+    </update>
+    
+    <insert id="admin.insertMemberInfoPass">
+    	
+    	INSERT INTO T_MEMBER_INFO_PASS
+    	(
+    		MEMBERNO,
+    		MOBILE,
+    		NAME,
+    		BIRTHYEAR,
+    		NICKNAME,
+    		REGION,
+    		JOB,
+    		COMPANY,
+    		BLOODTYPE,
+    		STANCE,
+    		GENDER,
+    		FAVORITE,
+    		FAVORITE_REASON,
+    		INTRODUCE,
+    		RELIGION,
+    		RELIGION_THINK
+    	)
+    	VALUES
+    	(
+    		#{memberNo},
+    		#{MOBILE},
+    		#{NAME},
+    		#{BIRTHYEAR},
+    		#{NICKNAME},
+    		#{REGION},
+    		#{JOB},
+    		#{COMPANY},
+    		#{BLOODTYPE},
+    		#{STANCE},
+    		#{GENDER},
+    		#{FAVORITE},
+    		#{FAVORITE_REASON},
+    		#{INTRODUCE},
+    		#{RELIGION},
+    		#{RELIGION_THINK}
+    	)
+    	
+    </insert>
+    
+    <update id="admin.updateMember" parameterType="hashmap">
+     	UPDATE T_MEMBER
+     	<trim prefix="SET" suffixOverrides=",">
+	     	<if test="status != null and status != ''">
+	     	STATUS = #{status},
+	     	</if>
+	     	<if test="isPass != null and isPass != ''">
+	     	ISPASS = #{isPass},
+	     	</if>
+	     	<if test="failReason != null and failReason != ''">
+	     	FAIL_REASON = #{failReason},
+	     	</if>
+     	</trim>
+     	WHERE NO = #{memberNo}
+     </update>
+     
+     <update id="admin.updateMemberInfoPass">
+    	UPDATE T_MEMBER_INFO_PASS
+    	<set>
+    		<if test="MOBILE != null and MOBILE != ''">
+    		MOBILE = #{MOBILE},
+    		</if>
+    		<if test="NICKNAME != null and NICKNAME != ''">
+    		NICKNAME = #{NICKNAME},
+    		</if>
+	    	<if test="REGION != null and REGION != ''">
+    		REGION = #{REGION},
+    		</if>
+    		<if test="JOB != null and JOB != ''">
+    		JOB = #{JOB},
+    		</if>
+    		<if test="COMPANY != null and COMPANY != ''">
+    		COMPANY = #{COMPANY},
+    		</if>
+    		<if test="STANCE != null and STANCE != ''">
+    		STANCE = #{STANCE},
+    		</if>
+    		<if test="FAVORITE != null and FAVORITE != ''">
+    		FAVORITE = #{FAVORITE},
+    		</if>
+    		<if test="FAVORITE_REASON != null and FAVORITE_REASON != ''">
+    		FAVORITE_REASON = #{FAVORITE_REASON},
+    		</if>
+    		<if test="INTRODUCE != null and INTRODUCE != ''">
+    		INTRODUCE = #{INTRODUCE},
+    		</if>
+    		<if test="RELIGION != null and RELIGION != ''">
+    		RELIGION = #{RELIGION},
+    		</if>
+    		<if test="RELIGION_THINK != null and RELIGION_THINK != ''">
+    		RELIGION_THINK = #{RELIGION_THINK},
+    		</if>
+    	</set>
+    	
+    	<if test="memberNo != null and memberNo != ''">
+    		WHERE MEMBERNO = #{memberNo}
+    	</if>
+    </update>
+    
+    <delete id="admin.deleteMemberInfo">
+    	<![CDATA[
+    	DELETE FROM T_MEMBER_INFO
+    	WHERE MEMBERNO = #{memberNo}
+    	]]>
+    </delete>
+
+	<select id="admin.selectNoticeList" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT IDX, TITLE, CONTENTS, HIT_CNT, IS_DEL, WRITER_ID, WRITER_IDX, REGDATE
+	     FROM T_NOTICE
+	     ORDER BY IDX DESC
+	     ]]>
+    </select>
+    
+	<insert id="admin.insertNotice">
+    	<![CDATA[
+    	INSERT INTO T_NOTICE
+    	(
+    		TITLE,
+    		CONTENTS,
+    		WRITER_IDX,
+    		WRITER_ID,
+    		REGDATE
+    	)
+    	VALUES
+    	(
+    		#{title},
+    		#{contents},
+    		#{writerIdx},
+    		#{writerId},
+    		now()
+    	)
+    	]]>
+    </insert>
+    
+    <update id="admin.updateAdminLastAccess">
+    	<![CDATA[
+    	UPDATE T_ADMIN 
+    	SET LAST_ACCESS_DT = now()
+    	WHERE IDX = #{idx}
+    	]]>
+    </update>
+    
+    <select id="admin.selectItemList" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT I.*
+	     FROM T_ITEM I
+	     ORDER BY I.IDX DESC
+	     ]]>
+    </select>
+    
+    <insert id="admin.insertItem">
+    	<![CDATA[
+    	INSERT INTO T_ITEM
+    	(
+    		NAME,
+    		EXPLANATION,
+    		NEED_CASH,
+    		NEED_REAL_CASH,
+    		IMG_ORIGIN_FILENAME,
+    		IMG_STORED_FILENAME,
+    		REGDATE,
+    		IMG_FILESIZE,
+    		IMG_FILEPATH,
+    		POSSIBLE_USE_CNT,
+    		KIND
+    	)
+    	VALUES
+    	(
+    		#{name},
+    		#{explanation},
+    		#{needCash},
+    		#{needRealCash},
+    		#{originalFileName},
+    		#{storedFileName},
+    		now(),
+    		#{fileSize},
+    		#{filePath},
+    		#{possibleUseCnt},
+    		#{kind}
+    	)
+    	]]>
+    </insert>
+
+</mapper>

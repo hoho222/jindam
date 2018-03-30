@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="front">
+
+	<select id="front.selectNoticeList" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT IDX, TITLE, HIT_CNT, REGDATE, WRITER_IDX, WRITER_ID
+	     FROM T_NOTICE
+	     WHERE IS_DEL = 'N'
+	     ORDER BY IDX DESC
+	     ]]>
+	     LIMIT #{limit} OFFSET #{page}
+    </select>
+    
+    <select id="front.selectNoticeCnt" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT COUNT(*) as COUNT
+	     FROM T_NOTICE
+	     WHERE IS_DEL = 'N'
+	     ]]>
+    </select>
+    
+    <select id="front.selectNoticeDetail" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT IDX, TITLE, HIT_CNT, CONTENTS, WRITER_IDX, WRITER_ID, REGDATE
+	     FROM T_NOTICE
+	     WHERE IDX = #{idx}
+	     ]]>
+    </select>
+    
+    <update id="front.updateNoticeHitCnt">
+    	<![CDATA[
+    	UPDATE T_NOTICE 
+    	SET HIT_CNT = HIT_CNT + 1  
+    	WHERE IDX = #{idx}
+    	]]>
+    </update>
+    
+     <select id="front.selectMemberDetail" parameterType="hashmap" resultType="hashmap">
+	     SELECT *
+	     FROM T_MEMBER
+	     WHERE 1=1 
+	     AND NO = #{no}
+     </select>
+     
+     <update id="front.updateMember" parameterType="hashmap">
+     	UPDATE T_MEMBER
+     	<trim prefix="SET" suffixOverrides=",">
+     		<if test="pw != null and pw != ''">
+	     	PW = #{pw},
+	     	</if><if test="isPossibleMatch != null and isPossibleMatch != ''">
+	     	ISPOSSIBLEMATCH = #{isPossibleMatch},
+	     	</if>
+	     	<if test="status != null and status != ''">
+	     	STATUS = #{status},
+	     	</if>
+	     	<if test="isAuth != null and isAuth != ''">
+	     	ISAUTH = #{isAuth},
+	     	</if>
+	     	<if test="isPass != null and isPass != ''">
+	     	ISPASS = #{isPass},
+	     	</if>
+	     	<if test="matchMemberNo != null and matchMemberNo != ''">
+	     	MATCH_MEMBERNO = #{matchMemberNo},
+	     	MATCHDATE = now(),
+	     	</if>
+	     	<if test="olderMatchMemberNo != null and olderMatchMemberNo != ''">
+	     	OLDER_MATCH_MEMBERNO = #{olderMatchMemberNo},
+	     	</if>
+	     	<if test="oldestMatchMemberNo != null and oldestMatchMemberNo != ''">
+	     	OLDEST_MATCH_MEMBERNO = #{oldestMatchMemberNo},
+	     	</if>
+	     	<if test="expressStatus != null and expressStatus != ''">
+	     	EXPRESS_STATUS = #{expressStatus},
+	     	</if>
+	     	<if test="cash != null">
+	     	CASH = #{cash},
+	     	</if>
+	     	<if test="deleteMatchMember != null and deleteMatchMember != ''">
+	     	MATCH_MEMBERNO = null,
+	     	MATCHDATE = null,
+	     	</if>
+	     	<if test="matchSuccessMemberNo != null and matchSuccessMemberNo != ''">
+	     	MATCH_SUCCESS_MEMBERNO = #{matchSuccessMemberNo},
+	     	MATCHSUCCESSDATE = now(),
+	     	</if>
+	     	<if test="deleteMatchSuccessMember != null and deleteMatchSuccessMember != ''">
+	     	MATCH_SUCCESS_MEMBERNO = null,
+	     	MATCHSUCCESSDATE = null,
+	     	</if>
+	     	<if test="viewAdToday != null and viewAdToday != ''">
+	     	VIEWADDATE = now(),
+	     	</if>
+	     	
+	     	<if test="uniqueKey != null and uniqueKey != ''">
+	     	UNIQUEKEY = #{uniqueKey},
+	     	</if>
+	     	<if test="name != null and name != ''">
+	     	NAME = #{name},
+	     	</if>
+	     	<if test="birthYear != null and birthYear != ''">
+	     	BIRTHYEAR = #{birthYear},
+	     	</if>
+	     	<if test="gender != null and gender != ''">
+	     	GENDER = #{gender},
+	     	</if>
+	     	
+     	</trim>
+     	WHERE NO = #{no}
+     </update>
+     
+     <select id="front.selectMemberInfoForMap" parameterType="hashmap" resultType="hashmap">
+	     SELECT MI.*
+	     FROM T_MEMBER_INFO MI
+	     WHERE 1=1 
+	     AND MEMBERNO = #{no}
+	     <if test="status != null and status != ''">
+		 AND (SELECT M.STATUS FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) = #{status}
+		 </if>
+		 <if test="isPass != null and isPass != ''">
+		 AND (SELECT M.ISPASS FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) = #{isPass}
+		 </if>
+     </select>
+     
+     
+    <resultMap type="HashMap" id="memberInfoResultMap">
+		<result property="FAVORITE_REASON" column="FAVORITE_REASON"/>
+		<result property="INTRODUCE" column="INTRODUCE"/>
+		<result property="RELIGION_THINK" column="RELIGION_THINK"/>
+	</resultMap>
+     <select id="front.selectMemberInfo" parameterType="hashmap" resultType="hashmap" resultMap="memberInfoResultMap">
+	     SELECT MI.*, 
+	     		(SELECT M.STATUS FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) AS STATUS,
+	     		(SELECT M.ISPASS FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) AS ISPASS
+	     FROM T_MEMBER_INFO MI
+	     WHERE 1=1 
+	     AND MI.MEMBERNO = #{no}
+     </select>
+     
+     <update id="front.updateMemberInfo">
+    	UPDATE T_MEMBER_INFO
+    	<set>
+    		<if test="mobile1 != null and mobile1 != '' and mobile2 != null and mobile2 != '' and mobile3 != null and mobile3 != ''">
+    		MOBILE = #{mobile},
+    		</if>
+    		<if test="nickName != null and nickName != ''">
+    		NICKNAME = #{nickName},
+    		</if>
+	    	<if test="region != null and region != ''">
+    		REGION = #{region},
+    		</if>
+    		<if test="job != null and job != ''">
+    		JOB = #{job},
+    		</if>
+    		<if test="company != null and company != ''">
+    		COMPANY = #{company},
+    		</if>
+    		<if test="stance != null and stance != ''">
+    		STANCE = #{stance},
+    		</if>
+    		<if test="favorite != null and favorite != ''">
+    		FAVORITE = #{favorite},
+    		</if>
+    		<if test="favoriteReason != null and favoriteReason != ''">
+    		FAVORITE_REASON = #{favoriteReason},
+    		</if>
+    		<if test="introduce != null and introduce != ''">
+    		INTRODUCE = #{introduce},
+    		</if>
+    		<if test="religion != null and religion != ''">
+    		RELIGION = #{religion},
+    		</if>
+    		<if test="religionThink != null and religionThink != ''">
+    		RELIGION_THINK = #{religionThink},
+    		</if>
+    		<if test="ageGap != null and ageGap != ''">
+    		AGE_GAP = #{ageGap},
+    		</if>
+    	</set>
+    	
+    	<if test="no != null and no != ''">
+    		WHERE MEMBERNO = #{no}
+    	</if>
+    </update>
+    
+    <insert id="front.insertMemberInfo">
+    	
+    	INSERT INTO T_MEMBER_INFO
+    	(
+    		MEMBERNO,
+    		MOBILE,
+    		NAME,
+    		BIRTHYEAR,
+    		NICKNAME,
+    		REGION,
+    		JOB,
+    		COMPANY,
+    		BLOODTYPE,
+    		STANCE,
+    		GENDER,
+    		FAVORITE,
+    		FAVORITE_REASON,
+    		INTRODUCE,
+    		RELIGION,
+    		RELIGION_THINK,
+    		AGE_GAP,
+    		REGDATE
+    	)
+    	VALUES
+    	(
+    		#{no},
+    		#{mobile},
+    		#{name},
+    		#{birthYear},
+    		#{nickName},
+    		#{region},
+    		#{job},
+    		#{company},
+    		#{bloodType},
+    		#{stance},
+    		#{gender},
+    		#{favorite},
+    		#{favoriteReason},
+    		#{introduce},
+    		#{religion},
+    		#{religionThink},
+    		#{ageGap},
+    		now()
+    	)
+    	
+    </insert>
+    
+    <insert id="front.insertMemberInfoPass">
+    	INSERT INTO T_MEMBER_INFO_PASS
+    	(
+    		MEMBERNO,
+    		MOBILE,
+    		NAME,
+    		BIRTHYEAR,
+    		NICKNAME,
+    		REGION,
+    		JOB,
+    		COMPANY,
+    		BLOODTYPE,
+    		STANCE,
+    		GENDER,
+    		FAVORITE,
+    		FAVORITE_REASON,
+    		INTRODUCE,
+    		RELIGION,
+    		RELIGION_THINK,
+    		AGE_GAP,
+    		REGDATE
+    	)
+    	VALUES
+    	(
+    		#{no},
+    		#{mobile},
+    		#{name},
+    		#{birthYear},
+    		#{nickName},
+    		#{region},
+    		#{job},
+    		#{company},
+    		#{bloodType},
+    		#{stance},
+    		#{gender},
+    		#{favorite},
+    		#{favoriteReason},
+    		#{introduce},
+    		#{religion},
+    		#{religionThink},
+    		#{ageGap},
+    		now()
+    	)
+    </insert>
+    
+    <insert id="front.insertMember">
+    	<![CDATA[
+    	INSERT INTO T_MEMBER
+    	(
+    		EMAIL,
+    		PW,
+    		REGDATE
+    	)
+    	VALUES
+    	(
+    		#{email},
+    		#{pw},
+    		now()
+    	)
+    	]]>
+    </insert>
+    
+    <insert id="front.insertMemberAccessLog">
+    	<![CDATA[
+    	INSERT INTO T_ACCESS_LOG
+    	(
+    		MEMBER_IDX,
+    		MEMBER_IP,
+    		ACCESS_PATH,
+    		REGDATE
+    	)
+    	VALUES
+    	(	
+    		#{memberIdx},
+    		#{memberIp},
+    		#{memberAccessPath},
+    		now()
+    	)
+    	]]>
+    </insert>
+    
+    <select id="front.selectMember" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT M.*, now() as Today
+	     FROM T_MEMBER M
+	     WHERE 1=1
+	     ]]>
+	     <if test="no != null and no != ''">
+	     	AND M.NO = #{no}
+	     </if>
+	     <if test="email != null and email != ''">
+	     	AND M.EMAIL = #{email}
+	     </if>
+	     <if test="pw != null and pw != ''">
+	     	AND M.PW = #{pw}
+	     </if>
+	     <if test="uniqueKey != null and uniqueKey != ''">
+	     	AND M.UNIQUEKEY = #{uniqueKey}
+	     </if>
+    </select>
+    
+    <select id="front.selectMemberList" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT NO, EMAIL, PW, REGDATE
+	     FROM T_MEMBER
+	     WHERE 1=1
+	     ]]>
+	     <if test="email != null and email != ''">
+	     	AND EMAIL = #{email}
+	     </if>
+	     <if test='isMatchSuccess == "F"'>
+	     	AND MATCH_SUCCESS_MEMBERNO is null
+	     	AND MATCHSUCCESSDATE is null
+	     </if>
+	     <if test="isPossibleMatch != null and isPossibleMatch != ''">
+	     	AND ISPOSSIBLEMATCH = #{isPossibleMatch}
+	     </if>
+	     <if test="random != null and random != ''">
+	     	ORDER BY rand()
+	     </if>
+	</select>
+	
+	<select id="front.selectMemberInfoList" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT MI.*
+	     FROM T_MEMBER_INFO MI
+	     WHERE 1=1
+	     ]]>
+	     <if test="status != null and status != ''">
+	     	AND (SELECT M.STATUS FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) = #{status}
+	     </if>
+	     <if test="isPass != null and isPass != ''">
+	     	AND (SELECT M.ISPASS FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) = #{isPass}
+	     </if>
+	     <if test="isPossibleMatch != null and isPossibleMatch != ''">
+	     	AND (SELECT M.ISPOSSIBLEMATCH FROM T_MEMBER M WHERE M.NO = MI.MEMBERNO) = #{isPossibleMatch}
+	     </if>
+	     <if test="myMemberNo != null and myMemberNo != ''">
+	     	AND MI.MEMBERNO != #{myMemberNo}
+	     </if>
+	     <if test="myGender != null and myGender != ''">
+	     	AND MI.GENDER != #{myGender}
+	     </if>
+	</select>
+    
+    <select id="front.isMemberCnt" parameterType="hashmap" resultType="string">
+	     <![CDATA[
+	     SELECT COUNT(*)
+	     FROM T_MEMBER
+	     WHERE 1=1
+	     ]]>
+	     <if test="email != null and email != ''">
+	     	AND EMAIL = #{email}
+	     </if>
+	     <if test="pw != null and pw != ''">
+	     	AND PW = #{pw}
+	     </if>
+    </select>
+    
+     <insert id="front.insertMessage">
+    	<![CDATA[
+    	INSERT INTO T_MESSAGE
+    	(
+    		KIND,
+    		SENDER_NO,
+    		RECIPIENT_NO,
+    		CONTENTS,
+    		SENDDATE
+    	)
+    	VALUES
+    	(
+    		#{kind},
+    		#{senderNo},
+    		#{recipientNo},
+    		#{contents},
+    		now()
+    	)
+    	]]>
+    </insert>
+    
+     <resultMap type="HashMap" id="messageResultMap">
+		<result property="CONTENTS" column="CONTENTS"/>
+	</resultMap>
+     <select id="front.selectMessageList" parameterType="hashmap" resultType="hashmap" resultMap="messageResultMap">
+	     <![CDATA[
+	     SELECT M.*,
+	     		(SELECT MI.NICKNAME FROM T_MEMBER_INFO MI WHERE MI.MEMBERNO = M.SENDER_NO) SENDER_NICKNAME,
+	     		(SELECT MI.NICKNAME FROM T_MEMBER_INFO MI WHERE MI.MEMBERNO = M.RECIPIENT_NO) RECIPIENT_NICKNAME
+	     FROM T_MESSAGE M
+	     WHERE 1=1
+	     ]]>
+	     <if test="senderNo != null and senderNo != ''">
+	     	AND M.SENDER_NO = #{senderNo}
+	     </if>
+	     <if test="recipientNo != null and recipientNo != ''">
+	     	AND M.RECIPIENT_NO = #{recipientNo}
+	     </if>
+	     ORDER BY IDX DESC
+     </select>
+     
+     <insert id="front.insertMatchSuccessHistory">
+    	<![CDATA[
+    	INSERT INTO T_MATCH_SUCCESS_HISTORY
+    	(
+    		MY_MEMBERNO,
+    		MATCHSUCCESS_MEMBERNO,
+    		MATCHSUCCESSDATE,
+    		ISMATCHSUCCESS
+    	)
+    	VALUES
+    	(
+    		#{myMemberNo},
+    		#{matchSuccessMemberNo},
+    		now(),
+    		#{isMatchSuccess}
+    	)
+    	]]>
+    </insert>
+    
+    <select id="front.selectMatchFailMemberList" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT *
+	     FROM T_MATCH_SUCCESS_HISTORY
+	     WHERE 1=1
+	     ]]>
+	     <if test="myMemberNo != null and myMemberNo != ''">
+	     	AND MY_MEMBERNO = #{myMemberNo}
+	     </if>
+	     <if test="isMatchSuccess != null and isMatchSuccess != ''">
+	     	AND ISMATCHSUCCESS = #{isMatchSuccess}
+	     </if>
+	</select>
+	
+	<update id="front.updateMatchSuccessHistory" parameterType="hashmap">
+     	UPDATE T_MATCH_SUCCESS_HISTORY
+     	<trim prefix="SET" suffixOverrides=",">
+	     	<if test="isMatchSuccess != null and isMatchSuccess != ''">
+	     	ISMATCHSUCCESS = #{isMatchSuccess},
+	     	BYEDATE = now(),
+	     	</if>
+	     	<if test="matchFailReason != null and matchFailReason != ''">
+	     	MATCHFAIL_REASON = #{matchFailReason},
+	     	</if>
+     	</trim>
+     	WHERE MY_MEMBERNO = #{myMemberNo}
+     	<if test="matchSuccessMemberNo != null and matchSuccessMemberNo != ''">
+     	AND MATCHSUCCESS_MEMBERNO = #{matchSuccessMemberNo}
+     	</if>
+     </update>
+     
+     <select id="front.selectItemList" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT *
+	     FROM T_ITEM
+	     WHERE 1=1
+	     ORDER BY IDX ASC
+	     ]]>
+	</select>
+	
+	<insert id="front.insertMemberItem">
+    	<![CDATA[
+    	INSERT INTO T_MEMBER_ITEM
+    	(
+    		ITEM_IDX,
+    		BUY_MEMBERNO,
+    		ISPOSSIBLEUSE,
+    		POSSIBLE_USE_CNT,
+    		USE_CNT,
+    		BUYDATE
+    	)
+    	VALUES
+    	(
+    		#{itemIdx},
+    		#{myMemberNo},
+    		#{isPossibleUse},
+    		(SELECT I.POSSIBLE_USE_CNT FROM T_ITEM I WHERE I.IDX = #{itemIdx}),
+    		#{useCnt},
+    		now()
+    	)
+    	]]>
+    </insert>
+    
+    <select id="front.selectMyItemList" parameterType="hashmap" resultType="hashmap">
+	     <![CDATA[
+	     SELECT MI.*,
+	     		I.*
+	     FROM T_MEMBER_ITEM MI
+	     JOIN T_ITEM I ON MI.ITEM_IDX = I.IDX
+	     WHERE 1=1
+	     ]]>
+	     <if test="myMemberNo != null and myMemberNo != ''">
+	     	AND MI.BUY_MEMBERNO = #{myMemberNo}
+	     </if>
+	     <if test="isPossibleUse != null and isPossibleUse != ''">
+	     	AND MI.ISPOSSIBLEUSE = #{isPossibleUse}
+	     </if>
+	     ORDER BY MI.IDX DESC
+	</select>
+	
+	<update id="front.updateMyItem" parameterType="hashmap">
+     	UPDATE T_MEMBER_ITEM
+     	<trim prefix="SET" suffixOverrides=",">
+	     	<if test="itemUseCnt != null and itemUseCnt != ''">
+	     	USE_CNT = #{itemUseCnt},
+	     	</if>
+	     	<if test="isPossibleUse != null and isPossibleUse != ''">
+	     	ISPOSSIBLEUSE = #{isPossibleUse},
+	     	</if>
+     	</trim>
+     	WHERE BUY_MEMBERNO = #{myMemberNo}
+     	AND ITEM_IDX = #{itemIdx}
+     </update>
+     
+     <select id="front.deleteMember">
+     	CALL proc_member_delete(#{memNo})
+     </select>
+    
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/jdbc  http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
+     
+    <!-- dotodb 스키마에 연결 -->
+    
+    <!-- 실DB -->
+    <!-- <bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/jindaam"/>
+        <property name="username" value="jindaam"/>
+        <property name="password" value="goaqjrdlfks1220*"/>
+    </bean>-->
+    
+    <!-- 테스트DB -->
+    <bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost/jindamdb"/>
+        <property name="username" value="jindam_admin"/>
+        <property name="password" value="1331"/>
+    </bean> 
+    
+    <!-- 로그에서 SQL문을 예쁘게 보여주기 -->
+    <bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+    	<constructor-arg ref="dataSourceSpied"/>
+    	<property name="logFormatter">
+    		<bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+    			<property name="loggingType" value="MULTI_LINE"/>
+    			<property name="sqlPrefix" value="SQL >> "/>
+    		</bean>
+    	</property>
+    </bean>
+</beans>
