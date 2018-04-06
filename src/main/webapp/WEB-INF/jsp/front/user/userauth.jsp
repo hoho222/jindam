@@ -29,7 +29,7 @@ IMP.certification({ // param
  		   success : function(rData, textStatus, xhr) {
  			  if(rData == "success") {
 					alert("본인인증에 성공하셨습니다!");
-					location.replace("${pageContext.request.contextPath}/index");
+					location.replace("${pageContext.request.contextPath}/users/userinfo/${memberNo}");
 			  } else if(rData == "fail_dup"){
 				    alert("본인인증 실패! 이미 해당 정보를 가진 고객이 있습니다.");
 					location.replace("${pageContext.request.contextPath}/index");

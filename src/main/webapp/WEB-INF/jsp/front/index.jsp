@@ -138,12 +138,12 @@ $(document).ready(function() {
 </head>
 
 <!-- Banner -->
-<section id="banner">
+<!-- <section id="banner">
 	<header>
 		<h2>진심을 담아<br>진심을 담은 당신을 만나고 싶어요. </h2>
 		<p>인연을 만날 땐 사진은 필요없습니다. <br>진실 된 당신의 이야기면 충분합니다.</p>
 	</header>
-</section>
+</section> -->
 
 <!-- Main -->
 <section id="intro" class="container">
@@ -178,7 +178,13 @@ $(document).ready(function() {
 	  	<c:choose>  		
 			<c:when test="${myMemberMap.ISAUTH eq 'F'}">
 				<!-- 비 본인인증 회원 -->
-				<a href="${pageContext.request.contextPath}/users/userauth/${sessionNo}">본인 인증하기</a>
+				<h2>본인인증</h2>
+				
+				<div style="margin:20px 0 20px 0;">당신을 보여주기 위해 본인인증이 필요합니다.<br>귀찮더라도 진실된 만남을 위해 본인인증을 부탁드립니다.</div>
+				
+				<div style="margin:20px 0 20px 0;"><i class="glyphicon glyphicon-ok-circle" style="font-size:100px;"></i></div>
+				
+				<a href="${pageContext.request.contextPath}/users/userauth/${sessionNo}" class="button alt">본인 인증하기</a>
 				<!-- <input type="button" value="본인 인증하기"/> -->
 			</c:when>
 			
@@ -503,6 +509,10 @@ $(document).ready(function() {
 						<c:otherwise>
 							<form id="loginFrm" name="loginFrm" method="post">
 							<input type="hidden" name="contextPath" value="${pageContext.request.contextPath}">
+								<div>
+									<h3>진심을 담아<br>당신과 만나고 싶어요.</h3>
+									<p>인연을 만날 땐 사진은 필요없습니다. <br>진실 된 당신의 이야기면 충분합니다.</p>
+								</div>
 								<div>
 									<div class="w3-col" style="width:50px"><i class="w3-xxlarge fa fa-user"></i></div>
 								    <div class="w3-rest">

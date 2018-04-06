@@ -100,6 +100,8 @@ public class FrontController {
 		Map<String, Object> memMap = frontService.selectMemberDetail(memberNo);
 		String isAuth = memMap.get("ISAUTH").toString();
 		
+		model.addAttribute("memberNo", memberNo);
+		
 		if("T".equals(isAuth)){
 			// 이미 해당 유저는 본인인증이 완료된 유저므로 index로 리다이렉트 시켜버림
 			return "redirect:/index";
