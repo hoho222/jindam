@@ -19,12 +19,14 @@
 							<div id="copyright">
 								<ul class="links">
 									<li>&copy; 진담. All rights reserved.</li>
+<c:if test="${sessionNo eq 'null' || sessionEmail eq 'null'}">									
 									<li>진담</li>
 									<li>대표: 황호</li>
 									<li>사업자 번호: 648-25-00668</li>
 									<li>이메일: ghkdgh2365@naver.com</li>
 									<li>주소 : 경기도 의정부시 누원로 52 203-801</li>
 									<li>전화번호 : 050-7884-6396</li>
+</c:if>									
 								</ul>
 							</div>
 
