@@ -158,9 +158,25 @@ function showDivs(n) {
 							
 							<div class="userInfoDiv">
 							      <span style="font-weight: bold;">폰번호</span>
-							      <input name="mobile1" type="text" size="3" maxlength="3" value="${memberInfoMap.mobile1 }" required>
-							      <input name="mobile2" type="text" size="3" maxlength="4" value="${memberInfoMap.mobile2 }" required>
-							      <input name="mobile2" type="text" size="3" maxlength="4" value="${memberInfoMap.mobile3 }" required>
+							      <%-- <div class="row">
+   									<div class="col-sm">
+							      		<input name="mobile1" type="text" size="3" maxlength="3" value="${memberInfoMap.mobile1 }" required>
+							      	</div>
+   									<div class="col-sm" style="padding-left: 1px;">
+							      		<input name="mobile2" type="text" size="3" maxlength="4" value="${memberInfoMap.mobile2 }" required>
+							      	</div>
+							      	<div class="col-sm" style="padding-left: 1px;">
+							      		<input name="mobile2" type="text" size="3" maxlength="4" value="${memberInfoMap.mobile3 }" required>
+							      	</div>
+							      </div> --%>
+							      
+							      <table>
+							      	<tr>
+							      		<td><input name="mobile1" type="text" size="3" maxlength="3" value="${memberInfoMap.mobile1 }" placeholder="010" required></td>
+							      		<td><input name="mobile2" type="text" size="3" maxlength="4" value="${memberInfoMap.mobile2 }" placeholder="1234" required></td>
+							      		<td><input name="mobile2" type="text" size="3" maxlength="4" value="${memberInfoMap.mobile3 }" placeholder="5678" required></td>
+							      	</tr>
+							      </table>
 							</div>
 							<div class="userInfoDiv">
 							      <span style="font-weight: bold;">이름</span>
